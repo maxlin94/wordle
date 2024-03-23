@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 
-export default observer(function Keyboard({ store }: { store: WordleStoreType }) {
+const Keyboard = observer(({ store }: { store: WordleStoreType }) => {
     const alphabet = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
     return (
         <div>
@@ -26,3 +26,5 @@ export default observer(function Keyboard({ store }: { store: WordleStoreType })
         </div>
     )
 })
+
+export default Keyboard;

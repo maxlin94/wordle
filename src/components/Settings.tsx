@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
 
-export default observer(function Settings({ store }: { store: WordleStoreType }) {
+const Settings = observer(({ store }: { store: WordleStoreType }) => {
     const [inputValue, setInputValue] = useState(store.wordLength);
     const [open, setOpen] = useState(false);
     const rounded = open ? 'rounded-t-md' : 'rounded-md';
@@ -49,3 +49,5 @@ export default observer(function Settings({ store }: { store: WordleStoreType })
     </div>
     )
 })
+
+export default Settings;
