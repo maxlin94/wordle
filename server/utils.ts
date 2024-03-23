@@ -7,7 +7,7 @@ export function getRandomWord(array: Array<string>, allowDuplicates: boolean) {
     return getRandomWord(array, allowDuplicates);
 }
 
-export function wordleCompare(guessWord: any, correctWord: string) {
+export function wordleCompare(guessWord: string, correctWord: string) {
     if(!guessWord || !correctWord || (guessWord.length !== correctWord.length)) return [];
     const GUESS = guessWord.toLowerCase().split('');
     const CORRECT = correctWord.toLowerCase().split('');
