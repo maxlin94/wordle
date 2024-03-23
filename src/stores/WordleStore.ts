@@ -1,14 +1,17 @@
 const WordleStore: WordleStoreType = {
     guesses: [],
     currentGuess: 0,
-    wordLength: 5,
+    wordLength: Math.floor(Math.random() * (8 - 4 + 1) + 4),
     currentWordLength: 0,
+    allowDuplicates: false,
     correctLetters: [],
     misplacedLetters: [],
     usedLetters: [],
     init: async function () {
         this.guesses = Array(6).fill(Array(this.wordLength).fill({ letter: '', result: '' }));
-        await fetch(`/api/words/random/${this.wordLength}`).then(res => res.json()).then(data => this.wordLength = data.wordLength);
+        await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}`)
+        .then(res => res.json())
+        .then(data => this.wordLength = data.wordLength);
         this.currentGuess= 0;
         this.currentWordLength = 0;
         this.correctLetters = [];
@@ -16,10 +19,9 @@ const WordleStore: WordleStoreType = {
         this.usedLetters = [];
     },
     submitGuess: async function (guess: string) {
-        if (this.currentGuess >= this.guesses.length || this.currentWordLength < this.wordLength) return
         const data = await fetch(`/api/words/guess?word=${guess}`).then(res => res.json()).then(data => data);
         if (data.message !== 'Success') return
-        data.result.forEach((guess: Guess) => {
+        data.result.forEach((guess: GuessType) => {
             if (guess.result === 'correct' && !this.correctLetters.includes(guess.letter)) {
                 this.correctLetters.push(guess.letter)
             }
@@ -41,8 +43,8 @@ const WordleStore: WordleStoreType = {
             this.guesses[this.currentGuess][this.currentWordLength].letter = '';
             return;
         }
-        if (key === 'Enter') {
-            const guess = this.guesses[this.currentGuess].map((letter: any) => letter.letter).join('');
+        if (key === 'Enter' && this.currentWordLength === this.wordLength) {
+            const guess = this.guesses[this.currentGuess].map((char: GuessType) => char.letter).join('');
             this.submitGuess(guess);
             return;
         }

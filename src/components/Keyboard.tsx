@@ -14,9 +14,9 @@ export default observer(function Keyboard({ store }: { store: WordleStoreType })
                             {...store}.usedLetters.includes(letter) ? 'bg-gray-600' : 'bg-gray-200';
                             return (
                                 <>
-                                    { i === 2 && j === 0 && <div key="enter" onClick={() => store.handleKeydown('Enter')} className={`m-2 p-4 bg-gray-200 rounded-sm font-bold cursor-pointer`}>ENTER</div> }
-                                    <div key={j} onClick={() => store.handleKeydown(letter)} className={`m-2 p-4 ${bgColor} rounded-sm font-bold cursor-pointer`}>{letter.toUpperCase()}</div>
-                                    { i === 2 && j === row.length - 1 && <div key="backspace" onClick={() => store.handleKeydown('Backspace')} className={`m-2 p-4 bg-gray-200 rounded-sm font-bold cursor-pointer`}>DEL</div> }
+                                    { i === 2 && j === 0 && <div key="enter" onClick={() => store.handleKeydown('Enter')} className={`m-1 p-4 bg-gray-200 rounded-sm font-bold cursor-pointer`}>ENTER</div> }
+                                    <div key={j} onClick={() => store.handleKeydown(letter)} className={`m-1 p-4 ${bgColor} rounded-sm font-bold cursor-pointer`}>{letter.toUpperCase()}</div>
+                                    { i === 2 && j === row.length - 1 && <div key="backspace" onClick={() => store.handleKeydown('Backspace')} className={`m-1 p-4 bg-gray-200 rounded-sm font-bold cursor-pointer`}>DEL</div> }
                                 </>
                             )
                         })}
