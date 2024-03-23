@@ -1,4 +1,5 @@
 import express, { Router, Request, Response} from 'express';
+import { getRandomWord, wordleCompare } from '../utils.ts';
 import session from 'express-session';
 import words from '../data/words.ts'
 
@@ -11,38 +12,18 @@ declare module "express-session" {
     }
 }
 
-function wordleCompare(guessWord: any, correctWord: string) {
-    if(!guessWord || !correctWord || (guessWord.length !== correctWord.length)) return [];
-    const GUESS = guessWord.toLowerCase().split('');
-    const CORRECT = correctWord.toLowerCase().split('');
-    const RESULT = GUESS.map((letter: string, index: number) => {
-        const isCorrect = GUESS[index] === CORRECT[index];
-        isCorrect ? CORRECT[index] = '' : null;
-        return { 
-            letter, 
-            result: isCorrect ? 'correct' : 'incorrect'
-        }
-    });
-    GUESS.forEach((letter: string, index: number) => {
-        if(CORRECT.includes(letter) && RESULT[index].result === 'incorrect') {
-            RESULT[index].result = 'misplaced';
-            CORRECT[CORRECT.indexOf(letter)] = '';
-        }
-    })
-    return RESULT;
-}
-
 apiRouter.use(session({
     secret: "very-secret",
     resave: false,
     saveUninitialized: false,
   }));
 
-apiRouter.get('/words/random/:length?', (req: Request, res: Response) => {
+apiRouter.get('/words/random/:length', (req: Request, res: Response) => {
     const length = req.params.length;
     const wordArr = words[parseInt(length)];
     if(!wordArr) return res.json({ message: 'Invalid length' });
-    const word = wordArr[Math.floor(Math.random() * wordArr.length)];
+    const allowDuplicates = req.query.duplicates === 'true';
+    const word = getRandomWord(wordArr, allowDuplicates);
     req.session.word = word;
     req.session.wordArr = wordArr;
     res.json({ wordLength: word.length });
