@@ -40,7 +40,7 @@ const Settings = observer(({ store }: { store: WordleStoreType }) => {
                             onChange={() => { store.allowDuplicates = !store.allowDuplicates; }} />
                     </div>
                     <button className="text-black text-lg bg-gray-200 font-bold rounded-md" onClick={() => {
-                        store.wordLength = inputValue;
+                        store.setWordLength(inputValue);
                         store.init()
                     }}>New word</button>
                 </div>
