@@ -1,14 +1,16 @@
-import { observer } from "mobx-react-lite";
 import Guess from "./Guess";
 
-const GuessBox = observer(({ store }: { store: WordleStoreType }) => {
+type GuessBoxProps = {
+    guesses: Array<Array<GuessType>>,
+    wordLength: number
+}
+
+export default function GuessBox ({ guesses, wordLength }: GuessBoxProps) {
     return (
         <div className="mb-5">
-            {Array(store.guesses.length).fill(0).map((_, i) => (
-                <Guess key={i} store={store} guess={{ ...store }.guesses[i]} />
+            {Array(guesses.length).fill(0).map((_, i) => (
+                <Guess key={i} guesses={guesses} wordLength={wordLength} index={i} />
             ))}
         </div>
     )
-})
-
-export default GuessBox
+}
