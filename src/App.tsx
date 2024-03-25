@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { useLocalObservable } from 'mobx-react-lite';
+import { useLocalObservable, observer } from 'mobx-react-lite';
 import WordleStore from './stores/WordleStore';
 import GuessBox from './components/GuessBox';
 import Keyboard from './components/Keyboard';
 import Settings from './components/Settings';
+import GameOverModal from './components/GameOverModal';
 
-export default function App() {
+const App = observer(() => {
   const store = useLocalObservable(() => WordleStore)
   useEffect(() => {
     store.init()
@@ -23,9 +24,22 @@ export default function App() {
       <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-400 mb-6">WORDLE</h1>
       <div className="relative">
         <Settings store={store} />
-        <GuessBox store={store} />
+        <GuessBox guesses={store.guesses} wordLength={store.wordLength} />
       </div>
-      <Keyboard store={store} />
+      {(store.hasWon || store.hasLost) &&
+        <GameOverModal init={store.init}
+        />
+      }
+      <Keyboard
+        keyboardProps={{
+          handleKeydown: store.handleKeydown,
+          correct: store.correctLetters,
+          used: store.usedLetters,
+          misplaced: store.misplacedLetters
+        }}
+      />
     </div>
   )
-}
+})
+
+export default App;
