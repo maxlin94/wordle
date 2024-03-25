@@ -1,41 +1,53 @@
-import express, { Router, Request, Response} from 'express';
-import { getRandomWord, wordleCompare } from '../utils.ts';
-import session from 'express-session';
-import words from '../data/words.ts'
+import express, { Router, Request, Response } from 'express';
+import { wordleCompare } from '../utils.ts';
+import { validateInput, startSession, validateGuess } from '../middleware.ts';
 
 const apiRouter: Router = express.Router();
 
 declare module "express-session" {
     interface SessionData {
         word: string,
-        wordArr: Array<string>
+        wordArr: Array<string>,
+        numGuesses: number,
+        hasWon: boolean,
+        hasLost: boolean,
+        startTime: number,
+        endTime: number | null,
+        guesses: Array<string>
     }
-}
+} 
 
-apiRouter.use(session({
-    secret: "very-secret",
-    resave: false,
-    saveUninitialized: false,
-  }));
-
-apiRouter.get('/words/random/:length', (req: Request, res: Response) => {
-    const length = req.params.length;
-    const wordArr = words[parseInt(length)];
-    if(!wordArr) return res.json({ message: 'Invalid length' });
-    const allowDuplicates = req.query.duplicates === 'true';
-    const word = getRandomWord(wordArr, allowDuplicates);
-    req.session.word = word;
-    req.session.wordArr = wordArr;
-    res.json({ wordLength: word.length });
+apiRouter.get('/words/random/:length', validateInput, startSession, (req: Request, res: Response) => {
+    if (!req.session.word) return res.status(500).json({ message: 'Error selecting word' });
+    res.json({ message: 'Random word chosen', wordLength: req.session.word.length });
 });
 
-apiRouter.get('/words/guess', (req: Request, res: Response) => {
-    if(!req.session.word) return res.json({ message: 'No word selected' });
+apiRouter.get('/words/guess', validateGuess, (req: Request, res: Response) => {
     const guess = req.query.word?.toString();
-    if(!guess) return res.json({ message: 'No guess provided' });
-    if(req.session.wordArr && req.session.wordArr.indexOf(guess) === -1) return res.json({ message: 'Word not in dictionary' });
+    if (!guess || !req.session.word) return res.status(400).json({ message: 'Invalid guess' });
+    req.session.guesses?.push(guess)
     const result = wordleCompare(guess, req.session.word);
-    res.json({ message: 'Success', result });
+    updateGameState(guess, req);
+    return res.json({ message: 'Success', result, hasWon: req.session.hasWon, hasLost: req.session.hasLost });
 });
+
+apiRouter.get('/result', (req: Request, res: Response) => {
+    if (!req.session.endTime || !req.session.startTime) return res.status(403).json({ message: 'No game finished' });
+    const timePassed = (req.session.endTime - req.session.startTime) / 1000;
+    res.json({ timePassed, word: req.session.word, numGuesses: req.session.numGuesses, hasWon: req.session.hasWon, hasLost: req.session.hasLost, guesses: req.session.guesses });
+});
+
+function updateGameState(guess: string, req: Request) {
+    const correctGuess = guess === req.session.word;
+    if (correctGuess) {
+        req.session.hasWon = true;
+        req.session.endTime = Date.now();
+    }
+    else if (!correctGuess && req.session.numGuesses === 5) {
+        req.session.hasLost = true;
+        req.session.endTime = Date.now();
+    }
+    req.session.numGuesses = (req.session.numGuesses || 0) + 1;
+}
 
 export default apiRouter;
