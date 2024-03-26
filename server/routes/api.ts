@@ -32,7 +32,7 @@ apiRouter.get('/words/guess', validateGuess, (req: Request, res: Response) => {
 });
 
 apiRouter.get('/result', (req: Request, res: Response) => {
-    if (!req.session.endTime || !req.session.startTime) return res.status(403).json({ message: 'No game finished' });
+    if (!req.session.endTime || !req.session.startTime || (!req.session.hasWon && !req.session.hasLost)) return res.status(403).json({ message: 'No game finished' });
     const timePassed = (req.session.endTime - req.session.startTime) / 1000;
     res.json({ timePassed, word: req.session.word, numGuesses: req.session.numGuesses, hasWon: req.session.hasWon, hasLost: req.session.hasLost, guesses: req.session.guesses });
 });
