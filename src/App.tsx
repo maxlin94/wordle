@@ -4,6 +4,7 @@ import WordleStore from './stores/WordleStore';
 import GuessBox from './components/GuessBox';
 import Keyboard from './components/Keyboard';
 import Settings from './components/Settings';
+import MakeGuess from './components/MakeGuess';
 import GameOverModal from './components/GameOverModal';
 
 const App = observer(() => {
@@ -23,21 +24,21 @@ const App = observer(() => {
     <div className="flex flex-col h-screen w-screen justify-center items-center bg-gray-800">
       <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-400 mb-6">WORDLE</h1>
       <div className="relative">
-        <Settings store={store} />
+        <Settings store={store}/>
         <GuessBox guesses={store.guesses} wordLength={store.wordLength} />
       </div>
       {(store.hasWon || store.hasLost) &&
-        <GameOverModal init={store.init}
-        />
+        <GameOverModal init={store.init} setForceNewWord={store.setForceNewWord}/>
       }
       <Keyboard
         keyboardProps={{
           handleKeydown: store.handleKeydown,
-          correct: store.correctLetters,
-          used: store.usedLetters,
-          misplaced: store.misplacedLetters
+          correctLetters: store.correctLetters,
+          usedLetters: store.usedLetters,
+          misplacedLetters: store.misplacedLetters
         }}
       />
+      <MakeGuess store={store} />
     </div>
   )
 })

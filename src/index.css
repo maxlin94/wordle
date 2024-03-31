@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.bg-letter-correct {
+    background-color: #00ff00;
+}
+
+.bg-letter-misplaced {
+    background-color: #ffff00;
+}
+
+.bg-letter-incorrect {
+    background-color: #5e5e5e;
+}
+
+.bg-letter-default {
+    background-color: #cccccc;
+}
+
+.keyboard-hover:hover {
+    opacity: 0.8;
+}

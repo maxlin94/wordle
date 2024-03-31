@@ -1,15 +1,29 @@
 import { useEffect, useState } from "react";
 
-export default function GameOverModal({ init }: { init: () => void}) {
+type GameOverModalProps = {
+    init: () => void,
+    setForceNewWord: (e: boolean) => void
+}
+
+export default function GameOverModal({ init, setForceNewWord }: GameOverModalProps) {
     const [gameState, setGameState] = useState({
         hasWon: false,
         hasLost: false,
         numGuesses: 0,
         word: '',
         timePassed: 0,
-        guesses: []
+        guesses: [],
     });
     const [loading, setLoading] = useState(true);
+    const PlayAgainBtn = () => {
+        return (
+            <button className="bg-gray-700 text-white p-2 rounded-lg font-semibold" onClick={() => {
+                setForceNewWord(true);
+                init();
+            }}>Play Again</button>
+        )
+    }
+
 
     useEffect(() => {
         try {
@@ -32,7 +46,7 @@ export default function GameOverModal({ init }: { init: () => void}) {
                 {gameState.hasLost && <>
                     <h2 className="text-4xl font-bold">Game Over</h2>
                     <p className="text-2xl">The word was: {gameState.word}</p>
-                    <button className="bg-gray-700 text-white p-2 rounded-lg font-semibold" onClick={() => init()}>Play Again</button>
+                    <PlayAgainBtn />
                 </>}
                 {gameState.hasWon && <>
                     <h2 className="text-4xl font-bold">Congratulations!</h2>
@@ -43,7 +57,7 @@ export default function GameOverModal({ init }: { init: () => void}) {
                         return <span key={index} className="mr-2">{capitalize(guess)}</span>
                     })}</p>
                     <div className="flex justify-between w-full">
-                    <button className="bg-gray-700 text-white p-2 mr-6 rounded-lg font-semibold" onClick={() => init()}>Play Again</button>
+                    <PlayAgainBtn />
                     <button className="bg-gray-700 text-white p-2 rounded-lg font-semibold">Submit to highscore</button>
                 </div>
                 </>}

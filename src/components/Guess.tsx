@@ -11,7 +11,7 @@ const Guess = observer(({ guesses, wordLength, index }: GuessProps) => {
             {Array(wordLength).fill(0).map((_, i) => {
                 const guess = guesses[index][i];
                 const result = guess.result;
-                const bgColor = result === 'correct' ? 'bg-green-500' : result === 'misplaced' ? 'bg-yellow-400' : result === 'incorrect' ? 'bg-gray-500' : 'bg-gray-400';
+                const bgColor = result === 'correct' ? 'bg-letter-correct' : result === 'misplaced' ? 'bg-letter-misplaced' : result === 'incorrect' ? 'bg-letter-incorrect' : 'bg-letter-default';
                 return <div key={i} className={`flex justify-center items-center h-12 w-12 m-1 text-2xl font-bold rounded-sm ${bgColor}`}>{guess.letter.toUpperCase()}</div>
             })}
         </div>

@@ -2,15 +2,15 @@ import { observer } from "mobx-react-lite";
 
 type KeyboardProps = {
     keyboardProps: {
-        correct: string[];
-        used: string[];
-        misplaced: string[];
+        correctLetters: string[];
+        usedLetters: string[];
+        misplacedLetters: string[];
         handleKeydown: (e: string) => void;
     };
 };
 
 const Keyboard = observer(({ keyboardProps }: KeyboardProps) => {
-    const { correct, used, misplaced, handleKeydown } = keyboardProps;
+    const { correctLetters, usedLetters, misplacedLetters, handleKeydown } = keyboardProps;
     const alphabet = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
     return (
         <div>
@@ -19,14 +19,14 @@ const Keyboard = observer(({ keyboardProps }: KeyboardProps) => {
                     <div key={i} className="flex justify-center">
                         {row.split('').map((letter, j) => {
                             const bgColor = 
-                            correct.includes(letter) ? 'bg-green-500' : 
-                            misplaced.includes(letter) ? 'bg-yellow-500' : 
-                            used.includes(letter) ? 'bg-gray-600' : 'bg-gray-200';
+                            correctLetters.includes(letter) ? 'bg-letter-correct' : 
+                            misplacedLetters.includes(letter) ? 'bg-letter-misplaced' : 
+                            usedLetters.includes(letter) ? 'bg-letter-incorrect' : 'bg-letter-default';
                             return (
                                 <>
-                                    { i === 2 && j === 0 && <div key="enter" onClick={() => handleKeydown('Enter')} className={`m-1 p-4 bg-gray-200 rounded-sm font-bold cursor-pointer`}>ENTER</div> }
-                                    <div key={j} onClick={() => handleKeydown(letter)} className={`m-1 p-4 ${bgColor} rounded-sm font-bold cursor-pointer`}>{letter.toUpperCase()}</div>
-                                    { i === 2 && j === row.length - 1 && <div key="backspace" onClick={() => handleKeydown('Backspace')} className={`m-1 p-4 bg-gray-200 rounded-sm font-bold cursor-pointer`}>DEL</div> }
+                                    { i === 2 && j === 0 && <div key="enter" onClick={() => handleKeydown('Enter')} className={`m-1 p-4 bg-letter-default rounded-sm font-bold cursor-pointer keyboard-hover`}>ENTER</div> }
+                                    <div key={j} onClick={() => handleKeydown(letter)} className={`m-1 p-4 ${bgColor} rounded-sm font-bold cursor-pointer keyboard-hover`}>{letter.toUpperCase()}</div>
+                                    { i === 2 && j === row.length - 1 && <div key="backspace" onClick={() => handleKeydown('Backspace')} className={`m-1 p-4 bg-letter-default rounded-sm font-bold cursor-pointer keyboard-hover`}>DEL</div> }
                                 </>
                             )
                         })}
