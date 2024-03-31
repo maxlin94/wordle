@@ -10,11 +10,14 @@ type WordleStoreType = {
     usedLetters: Array<string>,
     hasWon: boolean,
     hasLost: boolean,
+    forceNewWord: boolean,
     init: () => void,
     submitGuess: (guess: string) => void,
     handleKeydown: (key: string) => void,
     setWordLength: (length: number) => void,
-    resetGame: () => void
+    setForceNewWord: (value: boolean) => void,
+    resetGame: () => void,
+    fetchGuesses: () => Promise<void>
 }
 
 type GuessType = {

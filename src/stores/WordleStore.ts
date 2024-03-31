@@ -2,7 +2,7 @@ const WordleStore: WordleStoreType = {
     guesses: [],
     maxGuesses: 6,
     currentGuessIndex: 0,
-    wordLength: Math.floor(Math.random() * (8 - 4 + 1) + 4),
+    wordLength: 5,
     currentWordLength: 0,
     allowDuplicates: false,
     correctLetters: [],
@@ -10,15 +10,18 @@ const WordleStore: WordleStoreType = {
     usedLetters: [],
     hasWon: false,
     hasLost: false,
+    forceNewWord: false,
     init: async function () {
         this.guesses = Array(this.maxGuesses).fill(Array(this.wordLength).fill({ letter: '', result: '' }));
-        const data = await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}`);
+        const data = await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}&forceNewWord=${this.forceNewWord}`);
         const { wordLength } = await data.json();
         this.setWordLength(wordLength);
         this.resetGame();
+        await this.fetchGuesses();
     },
     submitGuess: async function (guess: string) {
-        const data = await fetch(`/api/words/guess?word=${guess}`).then(res => res.json()).then(data => data);
+        const result = await fetch(`/api/words/guess?word=${guess}`);
+        const data = await result.json();
         if (data.message !== 'Success') return
         data.result.forEach((guess: GuessType) => {
             if (guess.result === 'correct' && !this.correctLetters.includes(guess.letter)) {
@@ -55,6 +58,9 @@ const WordleStore: WordleStoreType = {
     setWordLength: function (length: number) {
         this.wordLength = length;
     },
+    setForceNewWord: function (value: boolean) {
+        this.forceNewWord = value;
+    },
     resetGame: function () {
         this.currentGuessIndex = 0;
         this.currentWordLength = 0;
@@ -63,6 +69,15 @@ const WordleStore: WordleStoreType = {
         this.usedLetters = [];
         this.hasWon = false;
         this.hasLost = false;
+    },
+    fetchGuesses: async function () {
+        const result = await fetch(`/api/result/guesses`)
+        const data = await result.json();
+        if(data.guesses.length === 0) return
+        data.guesses.forEach((guess: GuessType[], index: number) => {
+            this.guesses[index] = guess;
+        })
+        this.currentGuessIndex = data.currentGuessIndex;
     }
 }
 
