@@ -3,9 +3,11 @@ import words from './data/words.ts';
 import { getRandomWord } from './utils.ts';
 
 export function startSession(req: Request, _: Response, next: () => void) {
-    const length = req.params.length;
+    const length = parseInt(req.params.length);
     const allowDuplicates = req.query.duplicates === 'true';
-    const wordArr = words[parseInt(length)];
+    const forceNewWord = req.query.forceNewWord === 'true';
+    if(req.session.word && !forceNewWord && length === req.session.word.length) return next();
+    const wordArr = words[length];
     const word = getRandomWord(wordArr, allowDuplicates);
     req.session.guesses = [];
     req.session.word = word;
@@ -14,7 +16,6 @@ export function startSession(req: Request, _: Response, next: () => void) {
     req.session.numGuesses = 0;
     req.session.hasWon = false;
     req.session.hasLost = false;
-    console.log(word)
     next()
 }
 
@@ -30,10 +31,10 @@ export function validateGuess(req: Request, res: Response, next: () => void) {
         return res.status(400).json({ message: 'No guess provided' });
     }
     if (req.session.guesses && req.session.guesses.indexOf(guess) !== -1) {
-        return res.status(400).json({ message: 'Word already guessed' });
+        return res.json({ message: 'Word already guessed' });
     }
     if (req.session.wordArr && req.session.wordArr.indexOf(guess) === -1) {
-        return res.status(400).json({ message: 'Word not in dictionary' });
+        return res.json({ message: 'Word not in dictionary' });
     }
     next();
 }

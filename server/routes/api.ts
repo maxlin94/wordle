@@ -24,11 +24,21 @@ apiRouter.get('/words/random/:length', validateInput, startSession, (req: Reques
 
 apiRouter.get('/words/guess', validateGuess, (req: Request, res: Response) => {
     const guess = req.query.word?.toString();
-    if (!guess || !req.session.word) return res.status(400).json({ message: 'Invalid guess' });
+    if (!guess || !req.session.word) return res.json({ message: 'Invalid guess' });
     req.session.guesses?.push(guess)
     const result = wordleCompare(guess, req.session.word);
     updateGameState(guess, req);
     return res.json({ message: 'Success', result, hasWon: req.session.hasWon, hasLost: req.session.hasLost });
+});
+
+apiRouter.get('/result/guesses', (req: Request, res: Response) => {
+    if (!req.session.guesses || !req.session.word) return res.json({ message: 'No guesses' });
+    const guesses = [];
+    for(const guess of req.session.guesses) {
+        const result = wordleCompare(guess, req.session.word);
+        guesses.push(result);
+    }
+    res.json({ guesses, currentGuessIndex: req.session.numGuesses });
 });
 
 apiRouter.get('/result', (req: Request, res: Response) => {
