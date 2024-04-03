@@ -17,7 +17,8 @@ type WordleStoreType = {
     setWordLength: (length: number) => void,
     setForceNewWord: (value: boolean) => void,
     resetGame: () => void,
-    fetchGuesses: () => Promise<void>
+    fetchGuesses: () => Promise<void>,
+    fetchWord: () => Promise<void>
 }
 
 type GuessType = {

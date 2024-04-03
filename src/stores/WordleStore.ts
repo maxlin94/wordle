@@ -13,9 +13,7 @@ const WordleStore: WordleStoreType = {
     forceNewWord: false,
     init: async function () {
         this.guesses = Array(this.maxGuesses).fill(Array(this.wordLength).fill({ letter: '', result: '' }));
-        const data = await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}&forceNewWord=${this.forceNewWord}`);
-        const { wordLength } = await data.json();
-        this.setWordLength(wordLength);
+        await this.fetchWord();
         this.resetGame();
         await this.fetchGuesses();
     },
@@ -78,6 +76,11 @@ const WordleStore: WordleStoreType = {
             this.guesses[index] = guess;
         })
         this.currentGuessIndex = data.currentGuessIndex;
+    },
+    fetchWord: async function() {
+        const data = await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}&forceNewWord=${this.forceNewWord}`);
+        const { wordLength } = await data.json();
+        this.setWordLength(wordLength);
     }
 }
 
