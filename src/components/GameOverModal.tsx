@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SubmitHighscore from "./SubmitHighscore";
 
 type GameOverModalProps = {
     init: () => void,
@@ -41,28 +42,22 @@ export default function GameOverModal({ init, setForceNewWord }: GameOverModalPr
 
     return (
         <>
-        { !loading && 
-            <div className="fixed flex flex-col justify-center gap-4 text-white p-8 bg-black opacity-95  items-center rounded-md">
-                {gameState.hasLost && <>
-                    <h2 className="text-4xl font-bold">Game Over</h2>
-                    <p className="text-2xl">The word was: {gameState.word}</p>
-                    <PlayAgainBtn />
-                </>}
-                {gameState.hasWon && <>
-                    <h2 className="text-4xl font-bold">Congratulations!</h2>
-                    <p className="text-2xl">The word was: {capitalize(gameState.word)}</p>
-                    <p className="text-2xl">You won in: {gameState.timePassed}s</p>
-                    <p className="text-2xl">Number of guesses: {gameState.numGuesses}</p>
-                    <p>Your guesses: {gameState.guesses.map((guess, index) => {
-                        return <span key={index} className="mr-2">{capitalize(guess)}</span>
-                    })}</p>
-                    <div className="flex justify-between w-full">
-                    <PlayAgainBtn />
-                    <button className="bg-gray-700 text-white p-2 rounded-lg font-semibold">Submit to highscore</button>
+            {!loading &&
+                <div className="fixed flex flex-col justify-center gap-4 text-white p-8 bg-black opacity-95  items-center rounded-md">
+                    {gameState.hasLost && <>
+                        <h2 className="text-4xl font-bold">Game Over</h2>
+                        <p className="text-2xl">The word was: {capitalize(gameState.word)}</p>
+                        <PlayAgainBtn />
+                    </>}
+                    {gameState.hasWon && <>
+                        <h2 className="text-4xl font-bold">Congratulations!</h2>
+                        <p className="text-2xl">The word was: {capitalize(gameState.word)}</p>
+                        <p className="text-2xl">You won in: {gameState.timePassed}s</p>
+                        <SubmitHighscore />
+                        <PlayAgainBtn />
+                    </>}
                 </div>
-                </>}
-            </div>
-        }
+            }
         </>
     )
 }
