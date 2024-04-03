@@ -6,7 +6,7 @@ export function startSession(req: Request, _: Response, next: () => void) {
     const length = parseInt(req.params.length);
     const allowDuplicates = req.query.duplicates === 'true';
     const forceNewWord = req.query.forceNewWord === 'true';
-    if(req.session.word && !forceNewWord && length === req.session.word.length) return next();
+    if(req.session.word && !forceNewWord && length === req.session.word.length && !req.session.hasWon && !req.session.hasLost) next();
     const wordArr = words[length];
     const word = getRandomWord(wordArr, allowDuplicates);
     req.session.guesses = [];
@@ -16,6 +16,7 @@ export function startSession(req: Request, _: Response, next: () => void) {
     req.session.numGuesses = 0;
     req.session.hasWon = false;
     req.session.hasLost = false;
+    req.session.allowDuplicates = allowDuplicates;
     next()
 }
 

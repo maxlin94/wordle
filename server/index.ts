@@ -7,7 +7,7 @@ const port = process.env.PORT || 5080;
 
 app.use(express.json());
 app.use(session({
-  secret: "very-secret",
+  secret: process.env.SESSION_SECRET || 'very-secret',
   resave: false,
   saveUninitialized: false,    
 }));
