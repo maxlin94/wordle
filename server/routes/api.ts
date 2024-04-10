@@ -1,10 +1,10 @@
 import express, { Router, Request, Response } from 'express';
 import { wordleCompare } from '../utils.ts';
 import { validateInput, startSession, validateGuess } from '../middleware.ts';
-import { collections, connectToDatabase } from "../db/conn.ts";
+import { highscoreSchema } from "../schemas/highscore.tsx";
+import mongoose from 'mongoose';
 
 const apiRouter: Router = express.Router();
-connectToDatabase();
 
 declare module "express-session" {
     interface SessionData {
@@ -21,39 +21,19 @@ declare module "express-session" {
 }
 
 apiRouter.get('/highscore', async (_: Request, res: Response) => {
-    const result = await collections.highscore?.find().sort({ time: 1 }).limit(10).toArray();
-    if (result) {
-        res.json(result);
-    }
-    else {
-        res.status(500).json({ message: 'Error fetching highscores' });
-    }
+    const model = mongoose.model('highscore', highscoreSchema);
+    const highscores = await model.find().sort({ time: 1 });
+    res.json({ highscores });
 });
 
-apiRouter.put('/highscore', async (req: Request, res: Response) => {
+apiRouter.post('/highscore', async (req: Request, res: Response) => {
     const { name } = req.body;
     if (!name || !req.session.hasWon || !req.session.endTime || !req.session.startTime) return res.status(400).json({ message: 'Invalid input' });
     const seconds = (req.session.endTime - req.session.startTime) / 1000;
-    const result = await collections.highscore?.insertOne({
-        name,
-        time: seconds,
-        guesses: req.session.guesses,
-        wordLength: req.session.word?.length,
-        allowDuplicates: req.session.allowDuplicates
-    });
-    if (result) {
-        req.session.guesses = [];
-        req.session.word = '';
-        req.session.wordArr = [];
-        req.session.startTime = 0;
-        req.session.numGuesses = 0;
-        req.session.hasWon = false;
-        req.session.hasLost = false;
-        res.json({ message: 'Success' });
-    }
-    else {
-        res.status(500).json({ message: 'Error inserting highscore' });
-    }
+    const model = mongoose.model('highscore', highscoreSchema);
+    const newHighscore = new model({ name, time: seconds, guesses: req.session.guesses, wordLength: req.session.word?.length, allowDuplicates: req.session.allowDuplicates });
+    await newHighscore.save();
+    res.json({ message: 'Success' });
 });
 
 apiRouter.get('/words/random/:length', validateInput, startSession, (req: Request, res: Response) => {
@@ -61,7 +41,7 @@ apiRouter.get('/words/random/:length', validateInput, startSession, (req: Reques
     res.json({ message: 'Random word chosen', wordLength: req.session.word.length });
 });
 
-apiRouter.get('/words/guess', validateGuess, (req: Request, res: Response) => {
+apiRouter.post('/words/guess', validateGuess, (req: Request, res: Response) => {
     const guess = req.query.word?.toString();
     if (!guess || !req.session.word) return res.json({ message: 'Invalid guess' });
     req.session.guesses?.push(guess)

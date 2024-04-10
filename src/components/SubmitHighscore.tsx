@@ -10,7 +10,7 @@ export default function SubmitHighscore() {
     async function submit() {
         setLoading(true);
         await fetch('/api/highscore', {
-            method: 'PUT',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },

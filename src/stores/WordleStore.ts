@@ -18,7 +18,7 @@ const WordleStore: WordleStoreType = {
         await this.fetchGuesses();
     },
     submitGuess: async function (guess: string) {
-        const result = await fetch(`/api/words/guess?word=${guess}`);
+        const result = await fetch(`/api/words/guess?word=${guess}`, { method: 'POST' });
         const data = await result.json();
         if (data.message !== 'Success') return
         data.result.forEach((guess: GuessType) => {
