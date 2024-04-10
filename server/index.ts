@@ -3,6 +3,7 @@ import apiRouter from './routes/api';
 import session from 'express-session';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { highscoreSchema } from './schemas/highscore';
 
 dotenv.config();
 const app: Express = express();
@@ -18,12 +19,16 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+app.set('view engine', 'ejs');
+app.set('views', './src/views');
 app.use('/api', apiRouter);
 
 app.use(express.static('dist'));
 
-app.get('/', (_: Request, res: Response) => {
-  res.send('Hello World!');
+app.get('/highscore', async (_: Request, res: Response) => {
+  const model = mongoose.model('highscore', highscoreSchema);
+  const highscore = await model.find().sort({time: 1});
+  res.render('highscore', { highscore });
 });
 
 app.listen(port, () => {

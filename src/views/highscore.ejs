@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Wordle - About</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/index-DSU2tCuY.css'>
+    <script src='/assets/index.js' defer></script>
+</head>
+
+<body class="h-screen w-screen bg-gray-800">
+    <header>
+        <nav class="flex justify-between items-center bg-gray-900 p-4">
+          <a href="/" class="text-white text-2xl font-bold">Wordle</a>
+          <ul class="flex gap-10 p-4">
+            <a href="/" class="text-white">Play</a>
+            <a href="/about" class="text-white">About</a>
+            <a href="/highscore" class="text-white font-bold">Highscore</a>
+          </ul>
+        </nav>
+      </header>
+    <main>
+        <section class="flex flex-col items-center h-5/6">
+            <h1 class="text-3xl font-bold text-white">Highscore</h1>
+            <table class="table-auto">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-white">Rank</th>
+                        <th class="px-4 py-2 text-white">Name</th>
+                        <th class="px-4 py-2 text-white">Time</th>
+                        <th class="px-4 py-2 text-white">Word length</th>
+                        <th class="px-4 py-2 text-white">Guesses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% highscore.forEach((entry, index) => { %>
+                    <tr>
+                        <td class="border px-4 py-2 text-white text-center"><%= index + 1 %></td>
+                        <td class="border px-4 py-2 text-white text-center"><%= entry.name %></td>
+                        <td class="border px-4 py-2 text-white text-center"><%= entry.time %>s</td>
+                        <td class="border px-4 py-2 text-white text-center"><%= entry.wordLength %></td>
+                        <td class="border px-4 py-2 text-white text-center"><%= entry.guesses.toString().replaceAll(',', ', ') %></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+
+</html>
