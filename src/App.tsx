@@ -6,6 +6,7 @@ import Keyboard from './components/Keyboard';
 import Settings from './components/Settings';
 import MakeGuess from './components/MakeGuess';
 import GameOverModal from './components/GameOverModal';
+import Header from './components/Header';
 
 const App = observer(() => {
   const store = useLocalObservable(() => WordleStore)
@@ -21,24 +22,27 @@ const App = observer(() => {
     }
   }, [])
   return (
-    <div className="flex flex-col h-screen w-screen justify-center items-center bg-gray-800">
-      <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-400 mb-6">WORDLE</h1>
-      <div className="relative">
-        <Settings store={store}/>
-        <GuessBox guesses={store.guesses} wordLength={store.wordLength} />
+    <div className="h-screen w-screen bg-gray-800">
+      <Header />
+      <div className="flex flex-col justify-center items-center bg-gray-800">
+        <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-400 m-6">WORDLE</h1>
+        <div className="relative">
+          <Settings store={store} />
+          <GuessBox guesses={store.guesses} wordLength={store.wordLength} />
+        </div>
+        {(store.hasWon || store.hasLost) &&
+          <GameOverModal init={store.init} setForceNewWord={store.setForceNewWord} />
+        }
+        <Keyboard
+          keyboardProps={{
+            handleKeydown: store.handleKeydown,
+            correctLetters: store.correctLetters,
+            usedLetters: store.usedLetters,
+            misplacedLetters: store.misplacedLetters
+          }}
+        />
+        <MakeGuess store={store} />
       </div>
-      {(store.hasWon || store.hasLost) &&
-        <GameOverModal init={store.init} setForceNewWord={store.setForceNewWord}/>
-      }
-      <Keyboard
-        keyboardProps={{
-          handleKeydown: store.handleKeydown,
-          correctLetters: store.correctLetters,
-          usedLetters: store.usedLetters,
-          misplacedLetters: store.misplacedLetters
-        }}
-      />
-      <MakeGuess store={store} />
     </div>
   )
 })
