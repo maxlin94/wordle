@@ -1,11 +1,10 @@
 import express, { Express, Request, Response} from 'express';
 import apiRouter from './routes/api';
 import session from 'express-session';
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { highscoreSchema } from './schemas/highscore';
+import 'dotenv/config';
 
-dotenv.config();
 const app: Express = express();
 const port = process.env.PORT || 5080;
 const connectionOptions: mongoose.ConnectOptions = {
@@ -20,7 +19,7 @@ app.use(session({
   saveUninitialized: false,
 }));
 app.set('view engine', 'ejs');
-app.set('views', './src/views');
+app.set('views', './server/views');
 app.use('/api', apiRouter);
 
 app.use(express.static('dist'));

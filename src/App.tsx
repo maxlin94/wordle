@@ -7,6 +7,7 @@ import Settings from './components/Settings';
 import MakeGuess from './components/MakeGuess';
 import GameOverModal from './components/GameOverModal';
 import Header from './components/Header';
+import ErrorMessage from './components/ErrorMessage';
 
 const App = observer(() => {
   const store = useLocalObservable(() => WordleStore)
@@ -33,6 +34,7 @@ const App = observer(() => {
         {(store.hasWon || store.hasLost) &&
           <GameOverModal init={store.init} setForceNewWord={store.setForceNewWord} />
         }
+        { store.errorMessage && <ErrorMessage message={store.errorMessage} /> }
         <Keyboard
           keyboardProps={{
             handleKeydown: store.handleKeydown,

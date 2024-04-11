@@ -6,11 +6,11 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Wordle - About</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='/assets/index-DSU2tCuY.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/index-BzbzKV7Z.css'>
     <script src='/assets/index.js' defer></script>
 </head>
 
-<body class="h-screen w-screen bg-gray-800">
+<body class="h-screen bg-gray-800">
     <header>
         <nav class="flex justify-between items-center bg-gray-900 p-4">
           <a href="/" class="text-white text-2xl font-bold">Wordle</a>
@@ -23,8 +23,8 @@
       </header>
     <main>
         <section class="flex flex-col items-center h-5/6">
-            <h1 class="text-3xl font-bold text-white">Highscore</h1>
-            <table class="table-auto">
+            <h1 class="text-3xl font-bold text-white my-6">Highscore</h1>
+            <table class="table-auto mb-4">
                 <thead>
                     <tr>
                         <th class="px-4 py-2 text-white">Rank</th>
@@ -36,7 +36,8 @@
                 </thead>
                 <tbody>
                     <% highscore.forEach((entry, index) => { %>
-                    <tr>
+                        <% const bgColor = index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-800'; %>
+                    <tr class="<%= bgColor %>">
                         <td class="border px-4 py-2 text-white text-center"><%= index + 1 %></td>
                         <td class="border px-4 py-2 text-white text-center"><%= entry.name %></td>
                         <td class="border px-4 py-2 text-white text-center"><%= entry.time %>s</td>

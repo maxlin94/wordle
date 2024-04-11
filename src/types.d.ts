@@ -11,6 +11,7 @@ type WordleStoreType = {
     hasWon: boolean,
     hasLost: boolean,
     forceNewWord: boolean,
+    errorMessage: string,
     init: () => void,
     submitGuess: (guess: string) => void,
     handleKeydown: (key: string) => void,
@@ -18,7 +19,8 @@ type WordleStoreType = {
     setForceNewWord: (value: boolean) => void,
     resetGame: () => void,
     fetchGuesses: () => Promise<void>,
-    fetchWord: () => Promise<void>
+    fetchWord: () => Promise<void>,
+    flashError: (message: string) => void
 }
 
 type GuessType = {

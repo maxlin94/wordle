@@ -4,13 +4,14 @@ import { validateInput, startSession, validateGuess } from '../middleware.ts';
 import { highscoreSchema } from "../schemas/highscore.tsx";
 import mongoose from 'mongoose';
 
+const MAX_GUESSES = 6;
+
 const apiRouter: Router = express.Router();
 
 declare module "express-session" {
     interface SessionData {
         word: string,
         wordArr: Array<string>,
-        numGuesses: number,
         hasWon: boolean,
         hasLost: boolean,
         startTime: number,
@@ -29,7 +30,7 @@ apiRouter.get('/highscore', async (_: Request, res: Response) => {
 apiRouter.post('/highscore', async (req: Request, res: Response) => {
     const { name } = req.body;
     if (!name || !req.session.hasWon || !req.session.endTime || !req.session.startTime) return res.status(400).json({ message: 'Invalid input' });
-    const seconds = (req.session.endTime - req.session.startTime) / 1000;
+    const seconds = ((req.session.endTime - req.session.startTime) / 1000).toFixed(2);
     const model = mongoose.model('highscore', highscoreSchema);
     const newHighscore = new model({ name, time: seconds, guesses: req.session.guesses, wordLength: req.session.word?.length, allowDuplicates: req.session.allowDuplicates });
     await newHighscore.save();
@@ -57,13 +58,13 @@ apiRouter.get('/result/guesses', (req: Request, res: Response) => {
         const result = wordleCompare(guess, req.session.word);
         guesses.push(result);
     }
-    res.json({ guesses, currentGuessIndex: req.session.numGuesses });
+    res.json({ guesses, currentGuessIndex: req.session.guesses?.length });
 });
 
 apiRouter.get('/result', (req: Request, res: Response) => {
     if (!req.session.endTime || !req.session.startTime || (!req.session.hasWon && !req.session.hasLost)) return res.status(403).json({ message: 'No game finished' });
-    const timePassed = (req.session.endTime - req.session.startTime) / 1000;
-    res.json({ timePassed, word: req.session.word, numGuesses: req.session.numGuesses, hasWon: req.session.hasWon, hasLost: req.session.hasLost, guesses: req.session.guesses });
+    const timePassed = ((req.session.endTime - req.session.startTime) / 1000).toFixed(2);
+    res.json({ timePassed, word: req.session.word, numGuesses: req.session.guesses?.length, hasWon: req.session.hasWon, hasLost: req.session.hasLost, guesses: req.session.guesses });
 });
 
 function updateGameState(guess: string, req: Request) {
@@ -72,11 +73,10 @@ function updateGameState(guess: string, req: Request) {
         req.session.hasWon = true;
         req.session.endTime = Date.now();
     }
-    else if (!correctGuess && req.session.numGuesses === 5) {
+    else if (!correctGuess && req.session.guesses?.length === MAX_GUESSES) {
         req.session.hasLost = true;
         req.session.endTime = Date.now();
     }
-    req.session.numGuesses = (req.session.numGuesses || 0) + 1;
 }
 
 export default apiRouter;

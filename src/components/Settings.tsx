@@ -17,7 +17,7 @@ const Settings = observer(({ store }: {store: WordleStoreType}) => {
             <button className={`text-white text-lg font-semibold bg-gray-600 py-2 px-4 ${rounded} hover:text-opacity-75`} onClick={handleSetOpen}>Settings</button>
             <div className="relative">
                 {open &&
-                    <div className="flex flex-col absolute gap-5 p-5 w-40 bg-gray-600 rounded-b-md rounded-tr-md">
+                    <div className="flex flex-col absolute gap-5 p-5 w-52 bg-gray-600 rounded-b-md rounded-tr-md">
                         <div className="flex">
                             <label className="text-white text-lg mr-2" htmlFor="word-length">Length: </label>
                             <select name="word-length" id="word-length" value={inputValue} onChange={(e) => {
@@ -31,7 +31,7 @@ const Settings = observer(({ store }: {store: WordleStoreType}) => {
                             </select>
                         </div>
                         <div>
-                            <label className="text-white text-lg mr-2" htmlFor="allow-duplicates">Duplicates: </label>
+                            <label className="text-white text-lg mr-2" htmlFor="allow-duplicates">Duplicate letters: </label>
                             <input
                                 type="checkbox"
                                 name="allow-duplicates"
