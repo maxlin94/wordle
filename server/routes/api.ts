@@ -1,17 +1,14 @@
 import express, { Router, Request, Response } from 'express';
-import { wordleCompare } from '../utils.ts';
-import { validateInput, startSession, validateGuess } from '../middleware.ts';
-import { highscoreSchema } from "../schemas/highscore.tsx";
-import mongoose from 'mongoose';
-
-const MAX_GUESSES = 6;
+import { wordleCompare, updateGameState } from '../utils.ts';
+import { validateWordLength, startSession, validateGuess, validateHighscore } from '../middleware.ts';
+import { Highscore } from "../models/highscore.tsx";
 
 const apiRouter: Router = express.Router();
 
 declare module "express-session" {
     interface SessionData {
         word: string,
-        wordArr: Array<string>,
+        wordList: Array<string>,
         hasWon: boolean,
         hasLost: boolean,
         startTime: number,
@@ -21,28 +18,20 @@ declare module "express-session" {
     }
 }
 
-apiRouter.get('/highscore', async (_: Request, res: Response) => {
-    const model = mongoose.model('highscore', highscoreSchema);
-    const highscores = await model.find().sort({ time: 1 });
-    res.json({ highscores });
-});
-
-apiRouter.post('/highscore', async (req: Request, res: Response) => {
+apiRouter.post('/highscore', validateHighscore, async (req: Request, res: Response) => {
     const { name } = req.body;
-    if (!name || !req.session.hasWon || !req.session.endTime || !req.session.startTime) return res.status(400).json({ message: 'Invalid input' });
-    const seconds = ((req.session.endTime - req.session.startTime) / 1000).toFixed(2);
-    const model = mongoose.model('highscore', highscoreSchema);
-    const newHighscore = new model({ name, time: seconds, guesses: req.session.guesses, wordLength: req.session.word?.length, allowDuplicates: req.session.allowDuplicates });
-    await newHighscore.save();
+    const { guesses, allowDuplicates } = req.session;
+    const time = (((req.session.endTime || 0) - (req.session.startTime || 0)) / 1000).toFixed(2);
+    await Highscore.create({guesses, name, time, wordLength: req.session.word?.length, allowDuplicates});
     res.json({ message: 'Success' });
 });
 
-apiRouter.get('/words/random/:length', validateInput, startSession, (req: Request, res: Response) => {
+apiRouter.get('/words/random/:length', validateWordLength, startSession, (req: Request, res: Response) => {
     if (!req.session.word) return res.status(500).json({ message: 'Error selecting word' });
     res.json({ message: 'Random word chosen', wordLength: req.session.word.length });
 });
 
-apiRouter.post('/words/guess', validateGuess, (req: Request, res: Response) => {
+apiRouter.get('/words/guess', validateGuess, (req: Request, res: Response) => {
     const guess = req.query.word?.toString();
     if (!guess || !req.session.word) return res.json({ message: 'Invalid guess' });
     req.session.guesses?.push(guess)
@@ -64,19 +53,7 @@ apiRouter.get('/result/guesses', (req: Request, res: Response) => {
 apiRouter.get('/result', (req: Request, res: Response) => {
     if (!req.session.endTime || !req.session.startTime || (!req.session.hasWon && !req.session.hasLost)) return res.status(403).json({ message: 'No game finished' });
     const timePassed = ((req.session.endTime - req.session.startTime) / 1000).toFixed(2);
-    res.json({ timePassed, word: req.session.word, numGuesses: req.session.guesses?.length, hasWon: req.session.hasWon, hasLost: req.session.hasLost, guesses: req.session.guesses });
+    res.json({ timePassed, word: req.session.word });
 });
-
-function updateGameState(guess: string, req: Request) {
-    const correctGuess = guess === req.session.word;
-    if (correctGuess) {
-        req.session.hasWon = true;
-        req.session.endTime = Date.now();
-    }
-    else if (!correctGuess && req.session.guesses?.length === MAX_GUESSES) {
-        req.session.hasLost = true;
-        req.session.endTime = Date.now();
-    }
-}
 
 export default apiRouter;

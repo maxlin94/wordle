@@ -6,8 +6,7 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Wordle - About</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='/assets/index-BzbzKV7Z.css'>
-    <script src='/assets/index.js' defer></script>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/index.css'>
 </head>
 
 <body class="h-screen bg-gray-800">
@@ -32,6 +31,7 @@
                         <th class="px-4 py-2 text-white">Time</th>
                         <th class="px-4 py-2 text-white">Word length</th>
                         <th class="px-4 py-2 text-white">Guesses</th>
+                        <th class="px-4 py-2 text-white">Allow duplicate letters</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,6 +43,7 @@
                         <td class="border px-4 py-2 text-white text-center"><%= entry.time %>s</td>
                         <td class="border px-4 py-2 text-white text-center"><%= entry.wordLength %></td>
                         <td class="border px-4 py-2 text-white text-center"><%= entry.guesses.toString().replaceAll(',', ', ') %></td>
+                        <td class="border px-4 py-2 text-white text-center"><%= entry.allowDuplicates ? 'Yes' : 'No' %></td>
                     </tr>
                     <% }); %>
                 </tbody>
