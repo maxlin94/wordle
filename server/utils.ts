@@ -1,13 +1,18 @@
-export function getRandomWord(array: Array<string>, allowDuplicates: boolean) {
-    if(allowDuplicates) return array[Math.floor(Math.random() * array.length)];
+import { Request } from 'express';
+
+const MAX_GUESSES = 6;
+
+export function getRandomWord(array: Array<string>, allowDuplicates: boolean, maxTries = 1000): string {
+    if(!array || maxTries <= 0) return '';
     const randomIndex = Math.floor(Math.random() * array.length);
+    if(allowDuplicates) return array[randomIndex];
     const randomWord = array[randomIndex];
     const set = new Set(randomWord.split(''));
     if(set.size === randomWord.length) return randomWord;
-    return getRandomWord(array, allowDuplicates);
+    return getRandomWord(array, allowDuplicates, maxTries - 1);
 }
 
-export function wordleCompare(guessWord: string, correctWord: string) {
+export function wordleCompare(guessWord: string, correctWord: string): Array<GuessType> {
     if(!guessWord || !correctWord || (guessWord.length !== correctWord.length)) return [];
     const GUESS = guessWord.toLowerCase().split('');
     const CORRECT = correctWord.toLowerCase().split('');
@@ -26,4 +31,16 @@ export function wordleCompare(guessWord: string, correctWord: string) {
         }
     })
     return RESULT;
+}
+
+export function updateGameState(guess: string, req: Request) {
+    const correctGuess = guess === req.session.word;
+    if (correctGuess) {
+        req.session.hasWon = true;
+        req.session.endTime = Date.now();
+    }
+    else if (!correctGuess && req.session.guesses?.length === MAX_GUESSES) {
+        req.session.hasLost = true;
+        req.session.endTime = Date.now();
+    }
 }

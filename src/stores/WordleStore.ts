@@ -1,26 +1,30 @@
 const WordleStore: WordleStoreType = {
     guesses: [],
-    currentGuess: 0,
-    wordLength: Math.floor(Math.random() * (8 - 4 + 1) + 4),
+    maxGuesses: 6,
+    currentGuessIndex: 0,
+    wordLength: 5,
     currentWordLength: 0,
     allowDuplicates: false,
     correctLetters: [],
     misplacedLetters: [],
     usedLetters: [],
+    hasWon: false,
+    hasLost: false,
+    forceNewWord: false,
+    errorMessage: '',
     init: async function () {
-        this.guesses = Array(6).fill(Array(this.wordLength).fill({ letter: '', result: '' }));
-        await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}`)
-        .then(res => res.json())
-        .then(data => this.wordLength = data.wordLength);
-        this.currentGuess= 0;
-        this.currentWordLength = 0;
-        this.correctLetters = [];
-        this.misplacedLetters = [];
-        this.usedLetters = [];
+        this.guesses = Array(this.maxGuesses).fill(Array(this.wordLength).fill({ letter: '', result: '' }));
+        await this.fetchWord();
+        this.resetGame();
+        await this.fetchGuesses();
     },
     submitGuess: async function (guess: string) {
-        const data = await fetch(`/api/words/guess?word=${guess}`).then(res => res.json()).then(data => data);
-        if (data.message !== 'Success') return
+        const result = await fetch(`/api/words/guess?word=${guess}`);
+        const data = await result.json();
+        if (data.message !== 'Success') {
+            this.flashError(data.message)
+            return;
+        }
         data.result.forEach((guess: GuessType) => {
             if (guess.result === 'correct' && !this.correctLetters.includes(guess.letter)) {
                 this.correctLetters.push(guess.letter)
@@ -32,30 +36,61 @@ const WordleStore: WordleStoreType = {
                 this.usedLetters.push(guess.letter)
             }
         })
-        this.guesses[this.currentGuess] = data.result;
-        this.currentGuess++;
+        this.guesses[this.currentGuessIndex] = data.result;
+        this.hasWon = data.hasWon;
+        this.hasLost = data.hasLost;
+        this.currentGuessIndex++;
         this.currentWordLength = 0;
     },
     handleKeydown: function (key: string) {
-        if (this.currentGuess >= this.guesses.length) return;
-        if (key === 'Backspace' && this.currentWordLength > 0) {
+        if (this.currentGuessIndex >= this.maxGuesses || this.hasWon || this.hasLost) return;
+        else if (key === 'Backspace' && this.currentWordLength > 0) {
             this.currentWordLength--;
-            this.guesses[this.currentGuess][this.currentWordLength].letter = '';
-            return;
+            this.guesses[this.currentGuessIndex][this.currentWordLength].letter = '';
         }
-        if (key === 'Enter' && this.currentWordLength === this.wordLength) {
-            const guess = this.guesses[this.currentGuess].map((char: GuessType) => char.letter).join('');
+        else if (key === 'Enter' && this.currentWordLength === this.wordLength) {
+            const guess = this.guesses[this.currentGuessIndex].map((obj: GuessType) => obj.letter).join('');
             this.submitGuess(guess);
-            return;
         }
-        if (key.length === 1 && key.match(/[a-z]/i) && this.currentWordLength < this.wordLength) {
-            this.guesses[this.currentGuess][this.currentWordLength].letter = key;
+        else if (key.length === 1 && key.match(/[a-z]/i) && this.currentWordLength < this.wordLength) {
+            this.guesses[this.currentGuessIndex][this.currentWordLength].letter = key;
             this.currentWordLength++;
-            return;
         }
     },
     setWordLength: function (length: number) {
         this.wordLength = length;
+    },
+    setForceNewWord: function (value: boolean) {
+        this.forceNewWord = value;
+    },
+    resetGame: function () {
+        this.currentGuessIndex = 0;
+        this.currentWordLength = 0;
+        this.correctLetters = [];
+        this.misplacedLetters = [];
+        this.usedLetters = [];
+        this.hasWon = false;
+        this.hasLost = false;
+    },
+    fetchGuesses: async function () {
+        const result = await fetch(`/api/result/guesses`)
+        const data = await result.json();
+        if (data.guesses.length === 0) return
+        data.guesses.forEach((guess: GuessType[], index: number) => {
+            this.guesses[index] = guess;
+        })
+        this.currentGuessIndex = data.currentGuessIndex;
+    },
+    fetchWord: async function () {
+        const data = await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}&forceNewWord=${this.forceNewWord}`);
+        const { wordLength } = await data.json();
+        this.setWordLength(wordLength);
+    },
+    flashError: function (message: string) {
+        this.errorMessage = message;
+        setTimeout(() => {
+            this.errorMessage = '';
+        }, 1000);
     }
 }
 

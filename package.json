@@ -5,16 +5,20 @@
   "type": "module",
   "types": "server/index.d.ts",
   "scripts": {
+    "start": "tsx server",
     "dev": "tsx watch server",
     "build": "tsc && vite build --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "start": "npx tsx server/index.ts --watch"
+    "preview": "vite preview"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.9",
     "express": "^4.19.1",
     "express-session": "^1.18.0",
     "mobx-react-lite": "^4.0.6",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
