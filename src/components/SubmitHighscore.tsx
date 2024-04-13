@@ -17,10 +17,13 @@ export default function SubmitHighscore() {
             body: JSON.stringify({ name: name || 'Anonymous' })
         })
             .then((res) => {
-                if(res.ok) {
+                if(res.status === 200) {
                     setSuccess(true);
+                    return res.json()
                 }
-                return res.json()
+                else {
+                    throw new Error('Error submitting highscore');
+                }
             })
             .catch((err) => {
                 console.log(err)

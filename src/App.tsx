@@ -23,7 +23,7 @@ const App = observer(() => {
     }
   }, [])
   return (
-    <div className="h-screen w-screen bg-gray-800">
+    <div className="h-screen bg-gray-800">
       <Header />
       <div className="flex flex-col justify-center items-center bg-gray-800">
         <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-400 m-6">WORDLE</h1>
@@ -32,7 +32,7 @@ const App = observer(() => {
           <GuessBox guesses={store.guesses} wordLength={store.wordLength} />
         </div>
         {(store.hasWon || store.hasLost) &&
-          <GameOverModal init={store.init} setForceNewWord={store.setForceNewWord} />
+          <GameOverModal init={store.init} setForceNewWord={store.setForceNewWord} hasLost={store.hasLost} hasWon={store.hasWon} />
         }
         { store.errorMessage && <ErrorMessage message={store.errorMessage} /> }
         <Keyboard
@@ -43,7 +43,7 @@ const App = observer(() => {
             misplacedLetters: store.misplacedLetters
           }}
         />
-        <MakeGuess store={store} />
+        { !store.allowDuplicates && <MakeGuess store={store} /> }
       </div>
     </div>
   )

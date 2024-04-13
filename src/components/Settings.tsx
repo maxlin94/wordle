@@ -2,12 +2,12 @@ import { useState } from "react";
 import { observer } from "mobx-react-lite";
 
 const Settings = observer(({ store }: {store: WordleStoreType}) => {
-    const [inputValue, setInputValue] = useState(store.wordLength);
+    const [wordLength, setWordLength] = useState(store.wordLength);
     const [open, setOpen] = useState(false);
     const rounded = open ? 'rounded-t-md' : 'rounded-md';
 
-    const handleSetInputValue = (e: HTMLSelectElement) => {
-        setInputValue(parseInt(e.value))
+    const handleSetWordLength = (e: HTMLSelectElement) => {
+        setWordLength(parseInt(e.value))
     };
     const handleSetOpen = () => {
         setOpen(!open)
@@ -20,8 +20,8 @@ const Settings = observer(({ store }: {store: WordleStoreType}) => {
                     <div className="flex flex-col absolute gap-5 p-5 w-52 bg-gray-600 rounded-b-md rounded-tr-md">
                         <div className="flex">
                             <label className="text-white text-lg mr-2" htmlFor="word-length">Length: </label>
-                            <select name="word-length" id="word-length" value={inputValue} onChange={(e) => {
-                                handleSetInputValue(e.target)
+                            <select name="word-length" id="word-length" value={wordLength} onChange={(e) => {
+                                handleSetWordLength(e.target)
                             }}>
                                 <option value="4">4</option>
                                 <option value="5">5</option>
@@ -40,8 +40,8 @@ const Settings = observer(({ store }: {store: WordleStoreType}) => {
                                 onChange={() => { store.allowDuplicates = !store.allowDuplicates; }} />
                         </div>
                         <button className="text-black text-lg bg-gray-200 font-bold rounded-md" onClick={() => {
-                            store.forceNewWord = true;
-                            store.setWordLength(inputValue);
+                            store.setForceNewWord(true);
+                            store.setWordLength(wordLength);
                             store.init()
                         }}>New word</button>
                     </div>

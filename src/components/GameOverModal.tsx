@@ -3,17 +3,15 @@ import SubmitHighscore from "./SubmitHighscore";
 
 type GameOverModalProps = {
     init: () => void,
-    setForceNewWord: (e: boolean) => void
+    setForceNewWord: (value: boolean) => void,
+    hasLost: boolean,
+    hasWon: boolean
 }
 
-export default function GameOverModal({ init, setForceNewWord }: GameOverModalProps) {
-    const [gameState, setGameState] = useState({
-        hasWon: false,
-        hasLost: false,
-        numGuesses: 0,
+export default function GameOverModal({ init, setForceNewWord, hasLost, hasWon }: GameOverModalProps) {
+    const [result, setResult] = useState({
         word: '',
         timePassed: 0,
-        guesses: [],
     });
     const [loading, setLoading] = useState(true);
     const PlayAgainBtn = () => {
@@ -31,7 +29,7 @@ export default function GameOverModal({ init, setForceNewWord }: GameOverModalPr
             const fetchData = async () => {
                 const response = await fetch(`/api/result`);
                 const data = await response.json();
-                setGameState(data);
+                setResult(data);
                 setLoading(false);
             };
             fetchData();
@@ -44,15 +42,15 @@ export default function GameOverModal({ init, setForceNewWord }: GameOverModalPr
         <>
             {!loading &&
                 <div className="fixed flex flex-col justify-center gap-4 text-white p-8 bg-black opacity-95  items-center rounded-md">
-                    {gameState.hasLost && <>
+                    {hasLost && <>
                         <h2 className="text-4xl font-bold">Game Over</h2>
-                        <p className="text-2xl">The word was: {capitalize(gameState.word)}</p>
+                        <p className="text-2xl">The word was: {capitalize(result.word)}</p>
                         <PlayAgainBtn />
                     </>}
-                    {gameState.hasWon && <>
+                    {hasWon && <>
                         <h2 className="text-4xl font-bold">Congratulations!</h2>
-                        <p className="text-2xl">The word was: {capitalize(gameState.word)}</p>
-                        <p className="text-2xl">You won in: {gameState.timePassed}s</p>
+                        <p className="text-2xl">The word was: {capitalize(result.word)}</p>
+                        <p className="text-2xl">You won in: {result.timePassed}s</p>
                         <SubmitHighscore />
                         <PlayAgainBtn />
                     </>}

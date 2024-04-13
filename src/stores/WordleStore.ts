@@ -19,7 +19,7 @@ const WordleStore: WordleStoreType = {
         await this.fetchGuesses();
     },
     submitGuess: async function (guess: string) {
-        const result = await fetch(`/api/words/guess?word=${guess}`, { method: 'POST' });
+        const result = await fetch(`/api/words/guess?word=${guess}`);
         const data = await result.json();
         if (data.message !== 'Success') {
             this.flashError(data.message)
@@ -75,18 +75,18 @@ const WordleStore: WordleStoreType = {
     fetchGuesses: async function () {
         const result = await fetch(`/api/result/guesses`)
         const data = await result.json();
-        if(data.guesses.length === 0) return
+        if (data.guesses.length === 0) return
         data.guesses.forEach((guess: GuessType[], index: number) => {
             this.guesses[index] = guess;
         })
         this.currentGuessIndex = data.currentGuessIndex;
     },
-    fetchWord: async function() {
+    fetchWord: async function () {
         const data = await fetch(`/api/words/random/${this.wordLength}?duplicates=${this.allowDuplicates}&forceNewWord=${this.forceNewWord}`);
         const { wordLength } = await data.json();
         this.setWordLength(wordLength);
     },
-    flashError: function(message: string) {
+    flashError: function (message: string) {
         this.errorMessage = message;
         setTimeout(() => {
             this.errorMessage = '';
