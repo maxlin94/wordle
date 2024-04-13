@@ -6,8 +6,7 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Wordle - About</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='/assets/index-B4BucMVT.css'>
-    <script src='/assets/index.js' defer></script>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/index.css'>
 </head>
 
 <body class="h-screen w-screen bg-gray-800">
@@ -23,7 +22,19 @@
     </header>
     <main>
         <section class="flex flex-col items-center bg-gray-800">
-            <h1 class="text-3xl font-bold text-white">About</h1>
+            <h1 class="text-3xl font-bold text-white my-6">About the project</h1>
+            <div class="w-3/4">
+                <p class="text-white text-lg my-2">This project was created as part of a school assignment to create a clone of the game Wordle. It
+                    includes
+                    three main pages: one for playing the game, another for displaying highscores, and a third for
+                    project
+                    details.</p>
+                <p class="text-white text-lg my-2">The aim was to learn how to build a full-stack application. The game's interface was made using
+                    React,
+                    while the game's logic takes place on the server using Express.</p>
+                <p class="text-white text-lg my-2">Highscores are stored in a MongoDB database using Mongoose, and the highscore page is rendered on the
+                    server using EJS.</p>
+            </div>
         </section>
     </main>
 </body>
